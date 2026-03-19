@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+{% block title %}Apply to Jobs — AgentHire{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Page Header -->
+  <div class="anim-reveal mb-8">
+    <div class="section-badge">🚀 Job Applications</div>
+    <h1 class="page-title">Apply to Jobs</h1>
+    <p class="text-slate-400 mt-2">Paste job URLs and let the AI agent navigate, fill, and submit every application automatically.</p>
+    <div class="inline-flex items-center gap-2 mt-3 px-3 py-1.5 rounded-full text-xs font-medium text-slate-400 border border-slate-700/50 bg-slate-800/40">
+      <span style="width:6px;height:6px;background:#10b981;border-radius:50%;box-shadow:0 0 6px #10b981;display:inline-block"></span>
+      Up to 5 URLs per batch &nbsp;·&nbsp; Lever, Greenhouse, Workday &amp; more
+    </div>
+  </div>
+
+  <div class="grid lg:grid-cols-5 gap-6">
+
+    <!-- Left: URL inputs + launch (3 cols) -->
+    <div class="lg:col-span-3 space-y-4">
+
+      <!-- Profile incomplete warning -->
+      {% if not profile or not profile.is_complete %}
+      <div class="anim-reveal flex items-start gap-3 p-4 rounded-xl border border-amber-500/30 bg-amber-500/8">
+        <span class="text-xl flex-shrink-0">⚠️</span>
+        <div>
+          <p class="text-amber-300 font-semibold text-sm">Profile incomplete</p>
+          <p class="text-amber-400/70 text-xs mt-0.5">Complete your profile first — the agent needs your details to fill forms.
+            <a href="{{ url_for('profile.view_profile') }}" class="underline hover:text-amber-200 transition-colors">Complete profile →</a>
+          </p>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- URL Input Card -->
+      <div class="glass-card p-6 anim-reveal" style="transition-delay:0.05s">
+        <div class="flex items-center gap-2 mb-5">
+          <span style="font-size:1.1rem">🔗</span>
+          <h2 class="text-base font-700 text-white font-bold">Job URLs</h2>
+        </div>
+
+        <div id="url-inputs" class="space-y-3">
+          <div class="url-row flex items-center gap-3">
+            <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                 style="background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff">1</div>
+            <input type="url" class="job-url-input form-input flex-1"
+                   placeholder="https://jobs.lever.co/company/position..." id="url-input-1" autofocus>
+            <button class="clear-url-btn w-7 h-7 rounded-full flex items-center justify-center text-slate-600 hover:text-slate-300 hover:bg-slate-700/50 transition-all opacity-0 shrink-0" aria-label="Clear">✕</button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between mt-4">
+          <button id="add-url-btn"
+            class="flex items-center gap-1.5 text-sm text-purple-400 hover:text-purple-300 transition-colors font-medium disabled:opacity-30 disabled:cursor-not-allowed">
+            <span class="text-lg leading-none">＋</span> Add another URL
+          </button>
+          <button id="paste-btn"
+            class="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-300 border border-slate-700/50 hover:border-slate-600 px-3 py-1.5 rounded-lg transition-all">
+            📋 Paste from clipboard
+          </button>
+        </div>
+
+        <p id="url-limit-msg" class="mt-3 text-xs text-amber-400/80 hidden">Maximum 5 URLs per batch.</p>
+        <p class="mt-3 text-xs text-slate-600">Paste direct job posting URLs from Lever, Greenhouse, Workday, or any career page</p>
+      </div>
+
+      <!-- Launch Button -->
+      <div class="anim-reveal" style="transition-delay:0.1s">
+        <button id="launch-btn" class="btn-grad w-full py-4 text-lg" disabled>
+          <span id="launch-icon">🤖</span>
+          <span id="launch-text">Launch Agent</span>
+        </button>
+        <p class="text-center text-xs text-slate-600 mt-2">The agent navigates each portal, fills forms, and submits automatically</p>
+      </div>
+    </div>
+
+    <!-- Right: Profile summary card (2 cols) -->
+    <div class="lg:col-span-2">
+      <div class="glass-card p-5 anim-reveal sticky top-24" style="transition-delay:0.12s">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-bold text-white">👤 Your Profile</h3>
+          <a href="{{ url_for('profile.view_profile') }}"
+             class="text-xs text-purple-400 hover:text-purple-300 transition-colors">Edit →</a>
+        </div>
+
+        {% if profile %}
+        <div class="space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-sm shrink-0"
+                 style="background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(99,102,241,0.1));border:1px solid rgba(139,92,246,0.2)">
+              {{ (profile.full_name or '?')[0].upper() }}
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-white truncate">{{ profile.full_name or '—' }}</p>
+              <p class="text-xs text-slate-500 truncate">{{ profile.email_contact or '—' }}</p>
+            </div>
+          </div>
+
+          {% if profile.phone %}
+          <div class="flex items-center gap-2 text-xs text-slate-500">
+            <span>📞</span> <span>{{ profile.phone }}</span>
+          </div>
+          {% endif %}
+
+          <!-- Resume -->
+          <div class="flex items-center gap-2 text-xs {% if profile.resume_path %}text-emerald-400{% else %}text-amber-400{% endif %}">
+            {% if profile.resume_path %}
+            <span>📄</span>
+            <span class="truncate">{{ profile.resume_path.split('_',2)[-1] if '_' in profile.resume_path else profile.resume_path }}</span>
+            {% else %}
+            <span>⚠️</span> <span>No resume uploaded</span>
+            {% endif %}
+          </div>
+
+          <!-- Skills preview -->
+          {% if profile.skills %}
+          <div class="flex flex-wrap gap-1.5 mt-1">
+            {% for skill in profile.skills.split(',')[:5] %}
+            <span class="px-2 py-0.5 rounded-full text-xs"
+                  style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.2);color:#a78bfa">
+              {{ skill.strip() }}
+            </span>
+            {% endfor %}
+            {% if profile.skills.split(',')|length > 5 %}
+            <span class="text-xs text-slate-600">+{{ profile.skills.split(',')|length - 5 }} more</span>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          <!-- Completeness -->
+          {% set pct = profile.completeness_percentage %}
+          <div class="pt-3 mt-1 border-t border-white/5">
+            <div class="flex items-center justify-between text-xs mb-1.5">
+              <span class="text-slate-500">Profile complete</span>
+              <span class="{% if pct >= 80 %}text-emerald-400{% elif pct >= 50 %}text-amber-400{% else %}text-red-400{% endif %} font-bold">{{ pct }}%</span>
+            </div>
+            <div class="h-1.5 rounded-full overflow-hidden" style="background:rgba(255,255,255,0.05)">
+              <div class="h-full rounded-full transition-all duration-700"
+                   style="width:{{ pct }}%;background:{% if pct >= 80 %}linear-gradient(90deg,#10b981,#34d399){% elif pct >= 50 %}linear-gradient(90deg,#f59e0b,#fbbf24){% else %}linear-gradient(90deg,#ef4444,#f87171){% endif %}"></div>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="text-center py-6">
+          <div class="text-3xl mb-2">👤</div>
+          <p class="text-sm text-slate-400 mb-3">No profile yet</p>
+          <a href="{{ url_for('profile.view_profile') }}" class="btn-grad px-4 py-2 text-sm">Set up profile</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Section (appears after submit) -->
+  <div id="progress-section" class="hidden mt-8">
+    <div class="glass-card p-5 mb-5 anim-reveal">
+      <div class="flex items-center gap-3 mb-1">
+        <span id="terminal-dot" style="width:10px;height:10px;background:#10b981;border-radius:50%;box-shadow:0 0 8px #10b981;animation:pulse 1.5s ease-in-out infinite;display:inline-block"></span>
+        <h2 class="text-sm font-bold text-white">Agent Activity</h2>
+        <span id="overall-status" class="ml-auto text-xs text-slate-500">Initialising...</span>
+      </div>
+    </div>
+
+    <div id="job-cards" class="space-y-4"></div>
+
+    <!-- Completion summary -->
+    <div id="completion-summary" class="hidden mt-6">
+      <div class="glass-card p-8 text-center anim-reveal">
+        <div class="text-5xl mb-4" style="animation:rocketFloat 2s ease-in-out infinite">🎉</div>
+        <h3 class="text-2xl font-bold text-white mb-2">All Done!</h3>
+        <p id="summary-text" class="text-slate-400 mb-6"></p>
+        <a href="{{ url_for('agent.dashboard') }}" id="view-dashboard-btn"
+           class="btn-grad px-8 py-3">📊 View Dashboard →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Job card template -->
+<template id="job-card-template">
+  <div class="job-card glass-card overflow-hidden transition-all duration-300">
+    <div class="flex items-center gap-3 p-4 border-b border-white/5">
+      <div class="status-dot w-2.5 h-2.5 rounded-full bg-slate-600 shrink-0" style="animation:pulse 1.5s ease-in-out infinite"></div>
+      <div class="min-w-0 flex-1">
+        <p class="job-url-display text-sm text-slate-300 truncate font-mono"></p>
+        <p class="company-role text-xs text-slate-500 mt-0.5"></p>
+      </div>
+      <span class="status-badge shrink-0 px-2.5 py-1 text-xs font-bold rounded-full badge-pending">Pending</span>
+    </div>
+    <div class="browser-container hidden border-t border-white/5">
+      <!-- Iframe attempt (may be blocked by TinyFish CSP) -->
+      <div class="iframe-wrap relative" style="aspect-ratio:16/10;background:#000;">
+        <iframe src="about:blank" class="browser-iframe w-full h-full border-0"
+                allow="clipboard-read; clipboard-write; autoplay"></iframe>
+        <!-- Overlay shown while iframe is black / after timeout -->
+        <div class="iframe-fallback hidden absolute inset-0 flex flex-col items-center justify-center gap-4"
+             style="background:rgba(2,6,18,0.92);backdrop-filter:blur(4px)">
+          <div class="text-4xl">📺</div>
+          <p class="text-sm font-semibold text-white">Live browser view</p>
+          <p class="text-xs text-slate-400 text-center px-6">The streaming view can't be embedded here.<br>Open it in a new tab to watch the agent work.</p>
+          <a class="live-view-link btn-grad px-6 py-2.5 text-sm" href="#" target="_blank" rel="noopener">
+            Watch Live ↗
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="log-area p-4 max-h-72 overflow-y-auto space-y-1 hidden"
+         style="background:rgba(0,0,0,0.35);font-family:JetBrains Mono,Fira Code,monospace;font-size:0.72rem"></div>
+  </div>
+</template>
+
+<style>
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+@keyframes rocketFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.url-row:hover .clear-url-btn,
+.job-url-input:not(:placeholder-shown) ~ .clear-url-btn { opacity: 1 !important; }
+</style>
+
+<script src="{{ url_for('static', filename='js/apply.js') }}"></script>
+<script>
+// Paste from clipboard
+document.getElementById('paste-btn').addEventListener('click', async function() {
+  try {
+    var text = await navigator.clipboard.readText();
+    var urls = text.trim().split(/\s+/).filter(function(u){ return u.startsWith('http'); });
+    if (!urls.length) { showToast('No URLs found in clipboard','warning'); return; }
+    var inputs = document.querySelectorAll('.job-url-input');
+    var empty = Array.from(inputs).filter(function(i){ return !i.value.trim(); });
+    if (!empty.length) { showToast('All URL fields are filled','warning'); return; }
+    empty[0].value = urls[0];
+    empty[0].dispatchEvent(new Event('input'));
+    showToast('URL pasted!','success', 2500);
+  } catch(e) { showToast('Clipboard access was denied','error'); }
+});
+
+// Show/hide clear buttons
+document.getElementById('url-inputs').addEventListener('input', function(e) {
+  if (!e.target.classList.contains('job-url-input')) return;
+  var row = e.target.closest('.url-row');
+  var btn = row && row.querySelector('.clear-url-btn');
+  if (btn) btn.style.opacity = e.target.value.trim() ? '1' : '0';
+
+  // Enable/disable launch
+  var anyFilled = Array.from(document.querySelectorAll('.job-url-input')).some(function(i){ return i.value.trim(); });
+  var lb = document.getElementById('launch-btn');
+  lb.disabled = !anyFilled;
+});
+
+// Clear button
+document.getElementById('url-inputs').addEventListener('click', function(e) {
+  var btn = e.target.closest('.clear-url-btn');
+  if (!btn) return;
+  var input = btn.closest('.url-row').querySelector('.job-url-input');
+  input.value = ''; btn.style.opacity = '0';
+  input.dispatchEvent(new Event('input'));
+});
+</script>
+{% endblock %}

@@ -1,0 +1,76 @@
+/* AgentHire — Custom CSS */
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: #0a0f1e;
+  color: #f1f5f9;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #1e293b; }
+::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+/* ── Log area scrollbar ───────────────────────────────────────────────────── */
+.log-area::-webkit-scrollbar { width: 4px; }
+.log-area::-webkit-scrollbar-track { background: transparent; }
+.log-area::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+
+/* ── Flash message auto-dismiss ───────────────────────────────────────────── */
+.flash-msg {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* ── Status dot pulse colors ─────────────────────────────────────────────── */
+.status-dot.pending  { background-color: #64748b; }
+.status-dot.in_progress { background-color: #f59e0b; animation: pulse 1s ease-in-out infinite; }
+.status-dot.submitted { background-color: #10b981; animation: none; }
+.status-dot.failed   { background-color: #ef4444; animation: none; }
+
+/* ── Animations ───────────────────────────────────────────────────────────── */
+@keyframes fadeIn    { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp   { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse     { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+@keyframes spin      { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.animate-fade-in  { animation: fadeIn 0.3s ease-in-out; }
+.animate-slide-up { animation: slideUp 0.3s ease-out; }
+
+/* ── Typing cursor for log area ───────────────────────────────────────────── */
+.log-cursor::after {
+  content: '▋';
+  animation: pulse 1s ease-in-out infinite;
+  color: #3b82f6;
+}
+
+/* ── Form inputs (global) ────────────────────────────────────────────────── */
+input[type="text"], input[type="email"], input[type="url"],
+input[type="tel"], input[type="number"], input[type="password"],
+textarea, select {
+  color: white !important;
+}
+
+input::placeholder, textarea::placeholder { color: #64748b !important; }
+
+/* ── Gradient text utility ───────────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Card hover glow ─────────────────────────────────────────────────────── */
+.app-card:hover {
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.05);
+}
+
+/* ── Responsive table on mobile ──────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .log-area { max-height: 200px; }
+}

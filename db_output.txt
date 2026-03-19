@@ -1,0 +1,60 @@
+ID: 15
+URL: https://jobs.lever.co/openai
+Status: pending
+Error: None
+Created At: 2026-03-15 14:29:23.773553
+--------------------
+ID: 14
+URL: https://boards.greenhouse.io/duolingo
+Status: failed
+Error: Not confirmed.
+Created At: 2026-03-14 09:50:02.222013
+--------------------
+ID: 13
+URL: https://jobs.lever.co/openai
+Status: in_progress
+Error: None
+Created At: 2026-03-14 09:40:48.992903
+--------------------
+ID: 12
+URL: https://jobs.lever.co/openai
+Status: failed
+Error: Agent stream ended without a COMPLETED event.
+Created At: 2026-03-14 09:38:28.065461
+--------------------
+ID: 11
+URL: https://jobs.lever.co/openai
+Status: failed
+Error: The application could not be submitted because the 'Resume' field is mandatory on the Ashby application portal. While candidate skills and summary were provided in the 'Additional Information' field, the system requires a file upload to proceed. Per task instructions, actual file uploads were skipped, resulting in a validation error: 'Missing entry for required field: Resume'. Additionally, an initial submission attempt was flagged as spam by reCAPTCHA, which required browser reconfiguration to bypass.
+Created At: 2026-03-14 09:10:07.272892
+--------------------
+ID: 10
+URL: https://mygwork.com/organizations/aristocrat/jobs?gad_source=1&gad_campaignid=23049564621&gbraid=0AAAAABqyhSgvOxLoC9D8bmz0bDhGdTIx9&gclid=CjwKCAjw687NBhB4EiwAQ645drV35RC7oCBsHpzrFhufMbUr46dCuxCYrrMqpWNGYPkGoDeKWMpHGRoCGRkQAvD_BwE
+Status: failed
+Error: Mandatory account creation or login is required on the Aristocrat Workday portal before the application form can be accessed. Per the task instructions, mandatory login/account creation is considered a blocker.
+Created At: 2026-03-14 07:11:01.792075
+--------------------
+ID: 9
+URL: https://mygwork.com/organizations/aristocrat/jobs?gad_source=1&gad_campaignid=23049564621&gbraid=0AAAAABqyhSgvOxLoC9D8bmz0bDhGdTIx9&gclid=CjwKCAjw687NBhB4EiwAQ645drV35RC7oCBsHpzrFhufMbUr46dCuxCYrrMqpWNGYPkGoDeKWMpHGRoCGRkQAvD_BwE
+Status: failed
+Error: The application portal (Workday) is currently undergoing planned maintenance, making it impossible to access the application form or submit any applications at this time.
+Created At: 2026-03-14 06:56:21.478721
+--------------------
+ID: 8
+URL: https://unstop.com/job?quickApply=true&usertype=students&domain=2&oppstatus=open
+Status: failed
+Error: Agent stream ended without a COMPLETED event.
+Created At: 2026-03-10 15:44:41.711123
+--------------------
+ID: 7
+URL: https://unstop.com/job?quickApply=true&usertype=students&domain=2&oppstatus=open
+Status: failed
+Error: A Google ReCAPTCHA (image selection challenge) appeared on the registration form, which prevents further automated progress as per the instructions.
+Created At: 2026-03-10 15:40:17.995840
+--------------------
+ID: 6
+URL: https://unstop.com/job?quickApply=true&usertype=students&domain=2&oppstatus=open
+Status: failed
+Error: The application is blocked by a mandatory reCAPTCHA image challenge (rc-imageselect-tile) and specific dropdown validation errors for Location and Course Specialization that require manual selection from suggestions.
+Created At: 2026-03-10 15:38:49.660492
+--------------------

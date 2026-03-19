@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}Create Account — AgentHire{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-4 py-16" style="position:relative;overflow:hidden">
+
+  <!-- Ambient orb -->
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(99,102,241,0.08) 0%,transparent 70%);pointer-events:none"></div>
+
+  <div class="w-full max-w-md anim-reveal">
+
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <a href="{{ url_for('agent.index') }}" class="inline-flex flex-col items-center gap-3 group">
+        <svg width="52" height="52" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+             style="transition:transform 0.3s;filter:drop-shadow(0 0 16px rgba(139,92,246,0.5))" class="group-hover:scale-110">
+          <defs>
+            <linearGradient id="rg1" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#8b5cf6"/><stop offset="50%" stop-color="#6366f1"/><stop offset="100%" stop-color="#3b82f6"/>
+            </linearGradient>
+            <linearGradient id="rg2" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#e0e7ff"/><stop offset="100%" stop-color="#bfdbfe"/>
+            </linearGradient>
+          </defs>
+          <rect width="64" height="64" rx="14" fill="#0f0a1e"/>
+          <path d="M32 8 L50 18 L50 36 Q50 49 32 57 Q14 49 14 36 L14 18 Z" fill="url(#rg1)" opacity="0.92"/>
+          <path d="M32 20 L23 43 H27 L29.5 37 H34.5 L37 43 H41 L32 20Z M30.5 33 L32 28 L33.5 33 Z" fill="url(#rg2)" fill-rule="evenodd"/>
+          <circle cx="26.5" cy="47" r="2" fill="#e0e7ff" opacity="0.9"/>
+          <circle cx="37.5" cy="47" r="2" fill="#e0e7ff" opacity="0.9"/>
+        </svg>
+        <div>
+          <h1 class="text-2xl font-black" style="background:linear-gradient(135deg,#f1f5f9,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Create your account</h1>
+          <p class="text-slate-500 text-sm mt-0.5">Start automating your job search today</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Social proof strip -->
+    <div class="flex items-center justify-center gap-4 mb-6 text-xs text-slate-600">
+      <span>✅ Free forever</span>
+      <span>·</span>
+      <span>🔒 Secure</span>
+      <span>·</span>
+      <span>🤖 AI-powered</span>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+      <div class="mb-4 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium
+        {% if cat == 'error' %}text-red-300 border border-red-500/25{% else %}text-emerald-300 border border-emerald-500/25{% endif %}"
+        style="{% if cat == 'error' %}background:rgba(239,68,68,0.08){% else %}background:rgba(16,185,129,0.08){% endif %}">
+        {{ '❌' if cat == 'error' else '✅' }} {{ msg }}
+      </div>
+      {% endfor %}
+    {% endwith %}
+
+    <!-- Card -->
+    <div class="glass-card p-8">
+      <form method="POST" action="{{ url_for('auth.register') }}" id="register-form" novalidate>
+
+        <div class="mb-5">
+          <label for="email" class="form-label">Email Address</label>
+          <input type="email" id="email" name="email" autocomplete="email"
+                 value="{{ email|default('') }}"
+                 class="form-input" placeholder="you@example.com" required autofocus>
+        </div>
+
+        <div class="mb-5">
+          <label for="password" class="form-label">Password</label>
+          <div style="position:relative">
+            <input type="password" id="password" name="password" autocomplete="new-password"
+                   class="form-input" placeholder="At least 6 characters" required minlength="6" style="padding-right:2.8rem">
+            <button type="button" id="toggle-pw1"
+                    style="position:absolute;right:0.85rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#475569;font-size:1rem" aria-label="Show password">👁</button>
+          </div>
+          <!-- Strength bar -->
+          <div class="mt-2 h-1 rounded-full overflow-hidden" style="background:rgba(255,255,255,0.05)">
+            <div id="strength-bar" class="h-full rounded-full transition-all duration-400" style="width:0%;background:#ef4444"></div>
+          </div>
+          <p id="strength-label" class="text-xs mt-1 text-slate-600"></p>
+        </div>
+
+        <div class="mb-7">
+          <label for="confirm_password" class="form-label">Confirm Password</label>
+          <div style="position:relative">
+            <input type="password" id="confirm_password" name="confirm_password" autocomplete="new-password"
+                   class="form-input" placeholder="Repeat your password" required style="padding-right:2.8rem">
+            <button type="button" id="toggle-pw2"
+                    style="position:absolute;right:0.85rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#475569;font-size:1rem" aria-label="Show password">👁</button>
+          </div>
+          <p id="password-match-msg" class="text-xs mt-1.5 hidden"></p>
+        </div>
+
+        <button type="submit" id="register-submit" class="btn-grad w-full py-3.5 text-base">
+          <span id="reg-icon">🚀</span>
+          <span id="reg-text">Create Account</span>
+        </button>
+      </form>
+    </div>
+
+    <p class="text-center text-slate-500 mt-6 text-sm">
+      Already have an account?
+      <a href="{{ url_for('auth.login') }}" class="text-purple-400 hover:text-purple-300 font-semibold transition-colors">Sign in →</a>
+    </p>
+  </div>
+</div>
+
+<script>
+(function() {
+  var pw   = document.getElementById('password');
+  var cpw  = document.getElementById('confirm_password');
+  var msg  = document.getElementById('password-match-msg');
+  var sBar = document.getElementById('strength-bar');
+  var sLbl = document.getElementById('strength-label');
+
+  // Password strength
+  pw.addEventListener('input', function() {
+    var v = pw.value;
+    var score = 0;
+    if (v.length >= 6)  score++;
+    if (v.length >= 10) score++;
+    if (/[A-Z]/.test(v)) score++;
+    if (/[0-9]/.test(v)) score++;
+    if (/[^a-zA-Z0-9]/.test(v)) score++;
+    var pct   = (score / 5) * 100;
+    var color = score <= 1 ? '#ef4444' : score <= 3 ? '#f59e0b' : '#10b981';
+    var label = score <= 1 ? 'Weak' : score <= 3 ? 'Fair' : score === 5 ? 'Strong 💪' : 'Good';
+    sBar.style.width = pct + '%';
+    sBar.style.background = color;
+    sLbl.textContent = v.length ? label : '';
+    sLbl.style.color = color;
+    if (cpw.value) checkMatch();
+  });
+
+  // Match check
+  function checkMatch() {
+    if (!cpw.value) { msg.classList.add('hidden'); return; }
+    if (pw.value === cpw.value) {
+      msg.textContent = '✓ Passwords match';
+      msg.style.color = '#34d399';
+    } else {
+      msg.textContent = '✗ Passwords do not match';
+      msg.style.color = '#f87171';
+    }
+    msg.classList.remove('hidden');
+  }
+  cpw.addEventListener('input', checkMatch);
+
+  // Toggle visibility
+  function togglePw(btnId, inputId) {
+    document.getElementById(btnId).addEventListener('click', function() {
+      var inp = document.getElementById(inputId);
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+      this.textContent = inp.type === 'password' ? '👁' : '🙈';
+    });
+  }
+  togglePw('toggle-pw1','password');
+  togglePw('toggle-pw2','confirm_password');
+
+  // Loading on submit
+  document.getElementById('register-form').addEventListener('submit', function(e) {
+    if (pw.value !== cpw.value) {
+      e.preventDefault();
+      msg.textContent = '✗ Passwords do not match';
+      msg.style.color = '#f87171';
+      msg.classList.remove('hidden');
+      cpw.focus(); return;
+    }
+    var btn = document.getElementById('register-submit');
+    document.getElementById('reg-icon').innerHTML = '<span class="spinner" style="width:16px;height:16px"></span>';
+    document.getElementById('reg-text').textContent = 'Creating account...';
+    btn.disabled = true;
+  });
+})();
+</script>
+{% endblock %}

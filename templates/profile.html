@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+{% block title %}My Profile — AgentHire{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Header -->
+  <div class="anim-reveal mb-8">
+    <div class="section-badge">👤 Account</div>
+    <h1 class="page-title">Your Profile</h1>
+    <p class="text-slate-400 mt-2 text-sm">This information is used to auto-fill every job application the agent submits.</p>
+
+    <!-- Completion bar -->
+    {% set pct = profile.completeness_percentage if profile else 0 %}
+    <div class="mt-5 glass-card p-4">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Profile completeness</span>
+        <span class="text-sm font-bold {% if pct >= 80 %}text-emerald-400{% elif pct >= 50 %}text-amber-400{% else %}text-red-400{% endif %}">{{ pct }}% complete</span>
+      </div>
+      <div class="h-2 rounded-full overflow-hidden" style="background:rgba(255,255,255,0.05)">
+        <div id="completeness-bar" class="h-full rounded-full transition-all duration-1000"
+             style="width:0%;background:{% if pct >= 80 %}linear-gradient(90deg,#8b5cf6,#10b981){% elif pct >= 50 %}linear-gradient(90deg,#8b5cf6,#f59e0b){% else %}linear-gradient(90deg,#8b5cf6,#ef4444){% endif %}">
+        </div>
+      </div>
+      <p class="text-xs mt-2 {% if pct >= 80 %}text-emerald-400{% elif pct >= 50 %}text-amber-400{% else %}text-red-400{% endif %}">
+        {% if not profile or not profile.is_complete %}
+          ⚠️ Complete at least Full Name, Email and Phone to start applying.
+        {% else %}
+          ✅ Profile ready — you can apply for jobs.
+        {% endif %}
+      </p>
+    </div>
+  </div>
+
+  <form method="POST" action="{{ url_for('profile.view_profile') }}" id="profile-form">
+    <div class="space-y-5">
+
+      <!-- Section 1: Personal Info -->
+      <div class="glass-card p-6 anim-reveal" style="transition-delay:0.06s">
+        <h2 class="text-base font-bold text-white mb-5 flex items-center gap-2">
+          <span class="w-7 h-7 rounded-lg flex items-center justify-center text-sm"
+                style="background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(99,102,241,0.1));border:1px solid rgba(139,92,246,0.2)">👤</span>
+          Personal Information
+        </h2>
+        <div class="grid sm:grid-cols-2 gap-5">
+          <div>
+            <label for="full_name" class="form-label">Full Name <span class="text-red-400 normal-case">*</span></label>
+            <input type="text" id="full_name" name="full_name" class="form-input"
+                   value="{{ profile.full_name or '' }}" placeholder="Jane Smith" required>
+          </div>
+          <div>
+            <label for="email_contact" class="form-label">Contact Email <span class="text-red-400 normal-case">*</span></label>
+            <input type="email" id="email_contact" name="email_contact" class="form-input"
+                   value="{{ profile.email_contact or '' }}" placeholder="jane@example.com" required>
+          </div>
+          <div>
+            <label for="phone" class="form-label">Phone <span class="text-red-400 normal-case">*</span></label>
+            <input type="tel" id="phone" name="phone" class="form-input"
+                   value="{{ profile.phone or '' }}" placeholder="+1 (555) 123-4567" required>
+          </div>
+          <div>
+            <label for="location" class="form-label">Location</label>
+            <input type="text" id="location" name="location" class="form-input"
+                   value="{{ profile.location or '' }}" placeholder="San Francisco, CA">
+          </div>
+          <div>
+            <label for="linkedin_url" class="form-label">LinkedIn URL</label>
+            <input type="url" id="linkedin_url" name="linkedin_url" class="form-input"
+                   value="{{ profile.linkedin_url or '' }}" placeholder="https://linkedin.com/in/...">
+          </div>
+          <div>
+            <label for="portfolio_url" class="form-label">Portfolio / Website</label>
+            <input type="url" id="portfolio_url" name="portfolio_url" class="form-input"
+                   value="{{ profile.portfolio_url or '' }}" placeholder="https://yoursite.dev">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Professional -->
+      <div class="glass-card p-6 anim-reveal" style="transition-delay:0.1s">
+        <h2 class="text-base font-bold text-white mb-5 flex items-center gap-2">
+          <span class="w-7 h-7 rounded-lg flex items-center justify-center text-sm"
+                style="background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(37,99,235,0.1));border:1px solid rgba(59,130,246,0.2)">💼</span>
+          Professional Details
+        </h2>
+        <div class="grid sm:grid-cols-2 gap-5">
+          <div>
+            <label for="current_title" class="form-label">Current / Recent Title</label>
+            <input type="text" id="current_title" name="current_title" class="form-input"
+                   value="{{ profile.current_title or '' }}" placeholder="Senior Software Engineer">
+          </div>
+          <div>
+            <label for="experience_years" class="form-label">Years of Experience</label>
+            <input type="number" id="experience_years" name="experience_years" class="form-input"
+                   value="{{ profile.experience_years or '' }}" placeholder="5" min="0" max="50">
+          </div>
+          <div>
+            <label for="desired_role" class="form-label">Desired Role</label>
+            <input type="text" id="desired_role" name="desired_role" class="form-input"
+                   value="{{ profile.desired_role or '' }}" placeholder="Staff Engineer / EM">
+          </div>
+          <div>
+            <label for="salary_range" class="form-label">Salary Expectation</label>
+            <select id="salary_range" name="salary_range" class="form-input">
+              {% for opt in ['Not specified','$50k–$75k','$75k–$100k','$100k–$150k','$150k+','Open to discussion'] %}
+              <option value="{{ opt }}" {% if profile and profile.salary_range == opt %}selected{% endif %}>{{ opt }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="sm:col-span-2">
+            <label for="skills" class="form-label">Skills
+              <span class="normal-case text-slate-600 font-normal">(comma-separated)</span>
+            </label>
+            <textarea id="skills" name="skills" class="form-input" rows="2"
+                      placeholder="Python, React, AWS, PostgreSQL, Docker...">{{ profile.skills or '' }}</textarea>
+            <p class="text-xs text-slate-600 mt-1">The agent uses your skills to answer screening questions.</p>
+          </div>
+          <div class="sm:col-span-2">
+            <label for="cover_letter_template" class="form-label">Cover Letter Template</label>
+            <textarea id="cover_letter_template" name="cover_letter_template" class="form-input" rows="4"
+                      placeholder="I am excited to apply for the {role} position at {company}...">{{ profile.cover_letter_template or '' }}</textarea>
+            <p class="text-xs text-slate-600 mt-1">Used when job postings request a cover letter.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Save Button -->
+      <div class="anim-reveal" style="transition-delay:0.14s">
+        <button type="submit" id="save-profile-btn" class="btn-grad w-full py-4 text-lg">
+          <span id="save-icon">💾</span>
+          <span id="save-text">Save Profile</span>
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Resume Section (outside form) -->
+  <div class="glass-card p-6 mt-5 anim-reveal" style="transition-delay:0.18s">
+    <div class="flex items-center gap-3 mb-5">
+      <h2 class="text-base font-bold text-white flex items-center gap-2">
+        <span class="w-7 h-7 rounded-lg flex items-center justify-center text-sm"
+              style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(5,150,105,0.1));border:1px solid rgba(16,185,129,0.2)">📄</span>
+        Resume
+      </h2>
+      <span class="text-xs text-purple-400 font-semibold px-2.5 py-1 rounded-full"
+            style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2)">✨ Auto-fills profile</span>
+    </div>
+
+    {% if profile and profile.resume_path %}
+    <div class="flex items-center gap-3 p-3 rounded-xl mb-4" style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2)">
+      <span class="text-2xl">📄</span>
+      <div class="flex-1 min-w-0">
+        <p class="text-emerald-300 font-semibold text-sm">Resume uploaded</p>
+        <p class="text-slate-400 text-xs truncate">{{ profile.resume_path.split('_',2)[-1] if '_' in profile.resume_path else profile.resume_path }}</p>
+      </div>
+      <span class="text-emerald-400 text-lg">✓</span>
+    </div>
+    {% endif %}
+
+    <!-- Drop zone -->
+    <div id="drop-zone"
+         class="border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-300 group"
+         style="border-color:rgba(255,255,255,0.08);background:rgba(5,8,16,0.3)"
+         onclick="document.getElementById('resume-file').click()">
+      <div class="text-4xl mb-3 transition-transform duration-300 group-hover:scale-110" id="drop-icon">📂</div>
+      <p class="text-slate-300 font-semibold mb-1" id="drop-label">
+        {% if profile and profile.resume_path %}Replace resume{% else %}Upload your resume{% endif %}
+      </p>
+      <p class="text-slate-500 text-sm">PDF only · Max 16 MB · Drag &amp; drop or click to browse</p>
+      <p class="text-purple-400 text-xs mt-2 opacity-70">Fields will auto-fill from your resume ✨</p>
+    </div>
+
+    <input type="file" id="resume-file" accept=".pdf" class="hidden">
+
+    <!-- Upload progress -->
+    <div id="upload-progress" class="hidden mt-4">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-sm text-slate-300 flex items-center gap-2">
+          <span id="upload-spinner" class="spinner" style="width:14px;height:14px;border-width:2px"></span>
+          <span id="upload-fname-text"></span>
+        </span>
+        <span id="upload-pct" class="text-sm text-purple-400 font-mono">0%</span>
+      </div>
+      <div class="w-full rounded-full h-1.5" style="background:rgba(255,255,255,0.05)">
+        <div id="upload-bar" class="h-1.5 rounded-full transition-all duration-200"
+             style="width:0%;background:linear-gradient(90deg,#8b5cf6,#3b82f6)"></div>
+      </div>
+      <p id="parse-status" class="text-xs text-slate-500 mt-2 hidden">🤖 Parsing resume and extracting fields...</p>
+    </div>
+
+    <div id="upload-result" class="mt-3 text-sm hidden"></div>
+
+    <!-- Autofill panel -->
+    <div id="autofill-panel" class="hidden mt-4 p-4 rounded-xl" style="background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.2)">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-lg">✨</span>
+        <p class="text-blue-300 font-semibold text-sm">Profile auto-filled from resume!</p>
+        <span id="fields-count" class="ml-auto text-xs text-blue-400 px-2 py-0.5 rounded-full"
+              style="background:rgba(59,130,246,0.15)"></span>
+      </div>
+      <div id="autofill-list" class="space-y-1 text-xs text-slate-400 max-h-40 overflow-y-auto"></div>
+      <p class="text-xs text-slate-500 mt-3">ℹ️ Review above, then click <strong class="text-slate-300">Save Profile</strong>.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes autofillPulse {
+  0%   { box-shadow:0 0 0 0 rgba(139,92,246,0.5); border-color:rgba(139,92,246,0.8); background:rgba(139,92,246,0.1); }
+  60%  { box-shadow:0 0 0 6px rgba(139,92,246,0); border-color:rgba(139,92,246,0.4); }
+  100% { box-shadow:0 0 0 0 rgba(139,92,246,0); border-color:rgba(255,255,255,0.08); background:rgba(5,8,16,0.7); }
+}
+.autofill-highlight { animation: autofillPulse 1.6s ease-out forwards; }
+#drop-zone:hover { border-color: rgba(139,92,246,0.4) !important; background: rgba(139,92,246,0.04) !important; }
+</style>
+
+<script>
+// Animate completeness bar on load
+setTimeout(function() {
+  document.getElementById('completeness-bar').style.width = '{{ pct }}%';
+}, 200);
+
+// Save button loading state + toast
+document.getElementById('profile-form').addEventListener('submit', function() {
+  var btn = document.getElementById('save-profile-btn');
+  var icon = document.getElementById('save-icon');
+  var text = document.getElementById('save-text');
+  btn.disabled = true;
+  icon.innerHTML = '<span class="spinner"></span>';
+  text.textContent = 'Saving...';
+});
+
+// Flash messages → toast
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for cat, msg in messages %}
+    document.addEventListener('DOMContentLoaded', function() {
+      showToast('{{ msg|replace("'","\\'")|safe }}', '{{ "success" if cat == "success" else "error" if cat == "error" else "info" }}');
+    });
+  {% endfor %}
+{% endwith %}
+
+// ── Resume upload logic (preserved exactly) ──────────────────────────────────
+(function() {
+  var FIELD_MAP = {
+    full_name:'full_name', email_contact:'email_contact', phone:'phone',
+    location:'location', linkedin_url:'linkedin_url', portfolio_url:'portfolio_url',
+    current_title:'current_title', experience_years:'experience_years',
+    skills:'skills', cover_letter_template:'cover_letter_template',
+  };
+  var FIELD_LABELS = {
+    full_name:'Full Name', email_contact:'Email', phone:'Phone',
+    location:'Location', linkedin_url:'LinkedIn URL', portfolio_url:'Portfolio / GitHub',
+    current_title:'Current Title', experience_years:'Years of Experience',
+    skills:'Skills', cover_letter_template:'Cover Letter',
+  };
+
+  var dropZone  = document.getElementById('drop-zone');
+  var fileInput = document.getElementById('resume-file');
+
+  ['dragenter','dragover'].forEach(function(ev) {
+    dropZone.addEventListener(ev, function(e) {
+      e.preventDefault();
+      dropZone.style.borderColor = 'rgba(139,92,246,0.6)';
+    });
+  });
+  ['dragleave','drop'].forEach(function(ev) {
+    dropZone.addEventListener(ev, function() {
+      dropZone.style.borderColor = 'rgba(255,255,255,0.08)';
+    });
+  });
+  dropZone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    if (e.dataTransfer.files.length) uploadResume(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', function() {
+    if (fileInput.files.length) uploadResume(fileInput.files[0]);
+  });
+
+  function uploadResume(file) {
+    if (!file.name.toLowerCase().endsWith('.pdf')) { showResult('❌ Only PDF files are allowed.','error'); return; }
+    if (file.size > 16*1024*1024) { showResult('❌ File exceeds 16 MB.','error'); return; }
+
+    var progress = document.getElementById('upload-progress');
+    var bar      = document.getElementById('upload-bar');
+    var pctEl    = document.getElementById('upload-pct');
+    var fnameEl  = document.getElementById('upload-fname-text');
+    var ps       = document.getElementById('parse-status');
+
+    progress.classList.remove('hidden');
+    document.getElementById('autofill-panel').classList.add('hidden');
+    fnameEl.textContent = file.name;
+    bar.style.width = '0%'; pctEl.textContent = '0%';
+    document.getElementById('drop-icon').textContent  = '⏳';
+    document.getElementById('drop-label').textContent = 'Uploading & parsing...';
+    ps.classList.add('hidden');
+
+    var fd = new FormData(); fd.append('resume', file);
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST','{{ url_for("profile.upload_resume") }}');
+
+    xhr.upload.addEventListener('progress', function(e) {
+      if (e.lengthComputable) {
+        var p = Math.round((e.loaded/e.total)*100);
+        bar.style.width = p+'%'; pctEl.textContent = p+'%';
+        if (p >= 100) { ps.classList.remove('hidden'); pctEl.textContent = '✓ Parsing...'; }
+      }
+    });
+
+    xhr.onload = function() {
+      ps.classList.add('hidden');
+      var data; try { data = JSON.parse(xhr.responseText); } catch(e) { showResult('❌ Invalid server response.','error'); resetDropZone(); return; }
+      if (!data.success) { showResult('❌ ' + (data.error||'Upload failed.'), 'error'); resetDropZone(); return; }
+
+      var parsed = data.parsed || {};
+      var filled = [];
+      Object.keys(FIELD_MAP).forEach(function(k) {
+        if (!parsed[k]) return;
+        var el = document.getElementById(FIELD_MAP[k]);
+        if (!el || (el.value||'').trim()) return;
+        el.value = parsed[k];
+        el.classList.add('autofill-highlight');
+        setTimeout(function(){ el.classList.remove('autofill-highlight'); }, 2000);
+        filled.push({ key:k, value:parsed[k] });
+      });
+
+      bar.style.width = '100%'; pctEl.textContent = '100%';
+      document.getElementById('drop-icon').textContent  = '✅';
+      document.getElementById('drop-label').textContent = 'Resume uploaded · click to replace';
+
+      if (filled.length > 0) {
+        var listEl  = document.getElementById('autofill-list');
+        var countEl = document.getElementById('fields-count');
+        var panel   = document.getElementById('autofill-panel');
+        listEl.innerHTML = '';
+        filled.forEach(function(f) {
+          var disp = String(f.value).substring(0,65) + (String(f.value).length>65?'…':'');
+          var row = document.createElement('div');
+          row.style.cssText = 'display:flex;align-items:flex-start;gap:6px;margin-bottom:4px';
+          row.innerHTML = '<span style="color:#a78bfa;flex-shrink:0">✓</span>'
+            +'<span><strong style="color:#cbd5e1">'+escHtml(FIELD_LABELS[f.key]||f.key)+':</strong> '+escHtml(disp)+'</span>';
+          listEl.appendChild(row);
+        });
+        countEl.textContent = filled.length + ' field'+(filled.length!==1?'s':'')+' filled';
+        panel.classList.remove('hidden');
+        panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+        showToast('✨ '+filled.length+' field'+(filled.length!==1?'s':'')+' auto-filled from resume!','success');
+      } else {
+        showToast('✅ '+file.name+' uploaded.','success');
+      }
+    };
+    xhr.onerror = function() { showResult('❌ Network error.','error'); resetDropZone(); };
+    xhr.send(fd);
+  }
+
+  function resetDropZone() {
+    document.getElementById('drop-icon').textContent  = '📂';
+    document.getElementById('drop-label').textContent = 'Upload your resume';
+  }
+  function showResult(msg, type) {
+    var el = document.getElementById('upload-result');
+    el.textContent = msg;
+    el.style.color = type==='success'?'#34d399':type==='error'?'#f87171':'#fbbf24';
+    el.classList.remove('hidden');
+    if (type==='success') setTimeout(function(){ el.classList.add('hidden'); }, 7000);
+  }
+  function escHtml(s) {
+    var d = document.createElement('div');
+    d.appendChild(document.createTextNode(s));
+    return d.innerHTML;
+  }
+})();
+</script>
+{% endblock %}

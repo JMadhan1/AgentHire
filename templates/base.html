@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}AgentHire — AI Job Application Autopilot{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}AgentHire uses autonomous AI agents to navigate real career portals and submit job applications on your behalf.{% endblock %}" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50:  '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            },
+            surface: {
+              900: '#0a0f1e',
+              800: '#0f172a',
+              700: '#1e293b',
+              600: '#334155',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.3s ease-in-out',
+            'slide-up': 'slideUp 0.3s ease-out',
+            'pulse-slow': 'pulse 3s ease-in-out infinite',
+            'spin-slow': 'spin 2s linear infinite',
+          },
+          keyframes: {
+            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+            slideUp: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml"  href="{{ url_for('static', filename='images/favicon.svg') }}" />
+  <link rel="icon" type="image/png"      href="{{ url_for('static', filename='images/favicon.png') }}" sizes="32x32" />
+  <link rel="apple-touch-icon"           href="{{ url_for('static', filename='images/favicon.png') }}" />
+  <meta name="theme-color" content="#0a0e1a" />
+
+  {% block head %}{% endblock %}
+
+  <style>
+  /* ── GLOBAL PAGE BACKGROUND ───────────────────────────────────────────── */
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: #050810;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.016) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.016) 1px, transparent 1px),
+      radial-gradient(ellipse 70% 50% at 20% 10%, rgba(99,102,241,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 55% 40% at 80% 60%, rgba(139,92,246,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 45% 35% at 50% 90%, rgba(59,130,246,0.04) 0%, transparent 55%);
+    background-size: 60px 60px, 60px 60px, 100% 100%, 100% 100%, 100% 100%;
+  }
+  ::selection { background: rgba(139,92,246,0.4); color: #fff; }
+  ::-webkit-scrollbar       { width: 5px; }
+  ::-webkit-scrollbar-track { background: #050810; }
+  ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.4); border-radius: 3px; }
+
+  /* ── GLASS CARD ──────────────────────────────────────────────────────── */
+  .glass-card {
+    background: rgba(15,20,40,0.65);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+  }
+  .glass-card:hover {
+    border-color: rgba(255,255,255,0.13);
+  }
+
+  /* ── FORM INPUTS ─────────────────────────────────────────────────────── */
+  .form-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 0.45rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(5,8,16,0.7);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    color: #e2e8f0;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    font-size: 0.9rem;
+  }
+  .form-input:focus {
+    border-color: rgba(139,92,246,0.5);
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.15);
+  }
+  .form-input::placeholder { color: #334155; }
+  select.form-input { cursor: pointer; }
+  textarea.form-input { min-height: 90px; resize: vertical; }
+
+  /* ── GRADIENT BUTTON ─────────────────────────────────────────────────── */
+  .btn-grad {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    padding: 0.85rem 2rem;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1, #3b82f6);
+    color: #fff; font-weight: 700; font-size: 1rem;
+    border-radius: 14px;
+    box-shadow: 0 0 24px rgba(139,92,246,0.35), 0 0 48px rgba(139,92,246,0.12);
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    cursor: pointer; border: none;
+    position: relative; overflow: hidden;
+  }
+  .btn-grad:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 36px rgba(139,92,246,0.55), 0 0 70px rgba(139,92,246,0.2);
+  }
+  .btn-grad:disabled {
+    opacity: 0.45;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .btn-ghost {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #94a3b8; font-weight: 600; font-size: 0.9rem;
+    border-radius: 12px;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); color: #e2e8f0; }
+
+  /* ── SECTION HEADER ──────────────────────────────────────────────────── */
+  .section-badge {
+    display: inline-block;
+    padding: 0.3rem 0.9rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(139,92,246,0.3);
+    background: rgba(139,92,246,0.1);
+    color: #a78bfa;
+    font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  .page-title {
+    font-size: clamp(1.75rem,4vw,2.5rem);
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    background: linear-gradient(135deg, #f1f5f9, #a78bfa, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── SCROLL REVEAL ───────────────────────────────────────────────────── */
+  .anim-reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.55s cubic-bezier(0.4,0,0.2,1), transform 0.55s cubic-bezier(0.4,0,0.2,1);
+  }
+  .anim-reveal.visible { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    .anim-reveal { opacity: 1; transform: none; transition: none; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  /* ── STATUS BADGES ───────────────────────────────────────────────────── */
+  .badge-submitted { background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:#34d399; }
+  .badge-failed    { background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#f87171; }
+  .badge-running   { background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:#fbbf24; }
+  .badge-pending   { background:rgba(100,116,139,0.12);border:1px solid rgba(100,116,139,0.3);color:#94a3b8; }
+
+  /* ── TOAST ───────────────────────────────────────────────────────────── */
+  #toast-container { position:fixed;top:1.25rem;right:1.25rem;z-index:9999;display:flex;flex-direction:column;gap:0.6rem;pointer-events:none; }
+  .toast {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.85rem 1.25rem;
+    border-radius: 14px;
+    backdrop-filter: blur(16px);
+    border: 1px solid;
+    font-size: 0.875rem; font-weight: 500;
+    min-width: 260px; max-width: 360px;
+    pointer-events: all;
+    transform: translateX(110%);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.3s;
+    opacity: 0;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .toast.show  { transform: translateX(0); opacity: 1; }
+  .toast.hide  { transform: translateX(110%); opacity: 0; }
+  .toast-success { background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.35);color:#34d399; }
+  .toast-error   { background:rgba(239,68,68,0.15); border-color:rgba(239,68,68,0.35); color:#f87171; }
+  .toast-info    { background:rgba(59,130,246,0.15); border-color:rgba(59,130,246,0.35); color:#60a5fa; }
+  .toast-warning { background:rgba(245,158,11,0.15); border-color:rgba(245,158,11,0.35); color:#fbbf24; }
+
+  /* ── SPINNER ─────────────────────────────────────────────────────────── */
+  .spinner {
+    width:18px; height:18px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="bg-surface-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- ── Navigation ─────────────────────────────────────────────────────── -->
+  <style>
+    #main-nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15,23,42,0.8);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.3s;
+    }
+    #main-nav.scrolled { border-bottom-color: rgba(30,41,59,0.8); }
+    .nav-link {
+      position: relative;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      color: #94a3b8;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+      text-decoration: none;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 2px; left: 1rem; right: 1rem;
+      height: 1px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+    }
+    .nav-link:hover { color: #e2e8f0; }
+    .nav-link:hover::after { transform: scaleX(1); }
+    #mobile-menu {
+      transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.3s;
+      max-height: 0; opacity: 0; overflow: hidden;
+    }
+    #mobile-menu.open { max-height: 400px; opacity: 1; }
+  </style>
+  <nav id="main-nav">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+
+        <!-- Logo -->
+        <a href="{{ url_for('agent.index') }}" class="flex items-center gap-2 group" id="nav-logo" style="text-decoration:none;">
+          <!-- SVG inline logomark (always crisp at any size) -->
+          <svg width="32" height="32" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;transition:transform 0.25s;" class="group-hover:scale-110">
+            <defs>
+              <linearGradient id="nl1" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+                <stop offset="0%"   stop-color="#8b5cf6"/>
+                <stop offset="50%"  stop-color="#6366f1"/>
+                <stop offset="100%" stop-color="#3b82f6"/>
+              </linearGradient>
+              <linearGradient id="nl2" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+                <stop offset="0%"   stop-color="#e0e7ff"/>
+                <stop offset="100%" stop-color="#bfdbfe"/>
+              </linearGradient>
+            </defs>
+            <rect width="64" height="64" rx="14" fill="#0f0a1e"/>
+            <path d="M32 8 L50 18 L50 36 Q50 49 32 57 Q14 49 14 36 L14 18 Z" fill="url(#nl1)" opacity="0.92"/>
+            <path d="M32 20 L23 43 H27 L29.5 37 H34.5 L37 43 H41 L32 20Z M30.5 33 L32 28 L33.5 33 Z" fill="url(#nl2)" fill-rule="evenodd"/>
+            <circle cx="26.5" cy="47" r="2" fill="#e0e7ff" opacity="0.9"/>
+            <circle cx="37.5" cy="47" r="2" fill="#e0e7ff" opacity="0.9"/>
+          </svg>
+          <!-- Wordmark -->
+          <span style="font-size:1.2rem;font-weight:800;letter-spacing:-0.02em;background:linear-gradient(135deg,#a78bfa,#818cf8,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;transition:opacity 0.2s;" class="group-hover:opacity-80">
+            AgentHire
+          </span>
+        </a>
+
+        <!-- Desktop Nav -->
+        <div class="hidden md:flex items-center gap-1">
+          {% if current_user.is_authenticated %}
+            <a href="{{ url_for('agent.dashboard') }}"  id="nav-dashboard" class="nav-link">📊 Dashboard</a>
+            <a href="{{ url_for('agent.apply_page') }}" id="nav-apply"     class="nav-link">🚀 Apply</a>
+            <a href="{{ url_for('profile.view_profile') }}" id="nav-profile" class="nav-link">👤 Profile</a>
+            <div class="w-px h-5 bg-slate-700 mx-2"></div>
+            <a href="{{ url_for('auth.logout') }}" id="nav-logout"
+               class="nav-link hover:text-red-400" style="--hover-color:#f87171">↩ Logout</a>
+          {% else %}
+            <a href="{{ url_for('auth.login') }}"    id="nav-login"    class="nav-link">Sign In</a>
+            <a href="{{ url_for('auth.register') }}" id="nav-register"
+               class="ml-2 px-5 py-2 bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-lg shadow-brand-500/20 hover:scale-105">
+              Get Started Free
+            </a>
+          {% endif %}
+        </div>
+
+        <!-- Mobile hamburger -->
+        <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors" aria-label="Menu">
+          <svg id="hamburger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div id="mobile-menu">
+        <div class="pb-4 border-t border-slate-700/50 pt-3 space-y-1">
+          {% if current_user.is_authenticated %}
+            <a href="{{ url_for('agent.dashboard') }}" class="flex items-center gap-2 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-700/50 transition-colors">📊 Dashboard</a>
+            <a href="{{ url_for('agent.apply_page') }}" class="flex items-center gap-2 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-700/50 transition-colors">🚀 Apply</a>
+            <a href="{{ url_for('profile.view_profile') }}" class="flex items-center gap-2 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-700/50 transition-colors">👤 Profile</a>
+            <a href="{{ url_for('auth.logout') }}" class="flex items-center gap-2 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors">↩ Logout</a>
+          {% else %}
+            <a href="{{ url_for('auth.login') }}"    class="block px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-700/50 transition-colors">Sign In</a>
+            <a href="{{ url_for('auth.register') }}" class="block mt-1 px-4 py-3 bg-gradient-to-r from-brand-600 to-brand-500 text-white rounded-xl text-center font-semibold">Get Started Free</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+
+  <!-- ── Flash Messages ─────────────────────────────────────────────────── -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div id="flash-container" class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 space-y-2" aria-live="polite">
+        {% for category, message in messages %}
+          <div class="flash-msg flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
+            {% if category == 'success' %}bg-emerald-500/12 border border-emerald-500/25 text-emerald-300
+            {% elif category == 'error' %}bg-red-500/12 border border-red-500/25 text-red-300
+            {% elif category == 'warning' %}bg-amber-500/12 border border-amber-500/25 text-amber-300
+            {% else %}bg-brand-500/12 border border-brand-500/25 text-brand-300{% endif %}">
+            <span>{% if category == 'success' %}✅{% elif category == 'error' %}❌{% elif category == 'warning' %}⚠️{% else %}ℹ️{% endif %}</span>
+            <span>{{ message }}</span>
+            <button onclick="this.parentElement.remove()" class="ml-auto opacity-50 hover:opacity-100 transition-opacity text-lg">✕</button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- ── Main Content ────────────────────────────────────────────────────── -->
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────────── -->
+  <footer class="bg-surface-800/50 mt-auto">
+    <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(139,92,246,0.3),rgba(59,130,246,0.3),transparent)"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <svg width="22" height="22" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="fl1" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient></defs>
+            <rect width="64" height="64" rx="14" fill="#0f0a1e"/>
+            <path d="M32 8 L50 18 L50 36 Q50 49 32 57 Q14 49 14 36 L14 18 Z" fill="url(#fl1)" opacity="0.9"/>
+            <path d="M32 20 L23 43 H27 L29.5 37 H34.5 L37 43 H41 L32 20Z M30.5 33 L32 28 L33.5 33 Z" fill="#e0e7ff" fill-rule="evenodd"/>
+            <circle cx="26.5" cy="47" r="1.8" fill="#e0e7ff" opacity="0.8"/>
+            <circle cx="37.5" cy="47" r="1.8" fill="#e0e7ff" opacity="0.8"/>
+          </svg>
+          <span class="font-bold text-slate-300">AgentHire</span>
+          <span class="text-slate-700">·</span>
+          <span class="text-sm text-slate-600">AI Job Application Autopilot</span>
+        </div>
+        <div class="flex items-center gap-3 text-sm text-slate-500">
+          <button onclick="var m=document.getElementById('shortcuts-modal');m.classList.remove('hidden');m.style.display='flex'"
+                  class="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-400 transition-colors">
+            ⌨️ Shortcuts
+          </button>
+          <span class="text-slate-700">·</span>
+          <a href="https://tinyfish.ai" target="_blank" rel="noopener noreferrer"
+             class="flex items-center gap-1.5 px-3 py-1 rounded-full text-brand-400 hover:text-brand-300 transition-colors font-medium text-xs"
+             style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2)">
+            🐟 TinyFish Hackathon
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ── Keyboard Shortcuts Modal ───────────────────────────────────────── -->
+  <div id="shortcuts-modal" class="hidden"
+       style="position:fixed;inset:0;z-index:9998;align-items:center;justify-content:center;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px)"
+       onclick="if(event.target===this){this.classList.add('hidden');this.style.display=''}">
+    <div class="glass-card p-7 w-full max-w-sm mx-4">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-base font-bold text-white">⌨️ Keyboard Shortcuts</h3>
+        <button onclick="var m=document.getElementById('shortcuts-modal');m.classList.add('hidden');m.style.display=''"
+                class="text-slate-500 hover:text-white transition-colors text-lg">✕</button>
+      </div>
+      <div class="space-y-3">
+        {% for keys, desc in [('Ctrl/⌘ + N','Go to Apply page'),('Ctrl/⌘ + K','Focus dashboard search'),('Ctrl/⌘ + ?','Toggle shortcuts panel'),('Escape','Close modal')] %}
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-400">{{ desc }}</span>
+          <kbd class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold text-slate-300"
+               style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12)">{{ keys }}</kbd>
+        </div>
+        {% endfor %}
+      </div>
+      <p class="text-xs text-slate-600 mt-5">Click outside or press Escape to close.</p>
+    </div>
+  </div>
+
+  <!-- ── Toast Container ──────────────────────────────────────────────── -->
+  <div id="toast-container" aria-live="assertive"></div>
+
+  <!-- ── Scripts ────────────────────────────────────────────────────────── -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+
+  <script>
+  (function() {
+    // ── Navbar scroll-border + mobile menu ────────────────────────────────
+    var nav       = document.getElementById('main-nav');
+    var mobileBtn = document.getElementById('mobile-menu-btn');
+    var mobileMenu= document.getElementById('mobile-menu');
+    var hamburger = document.getElementById('hamburger-icon');
+    var closeIco  = document.getElementById('close-icon');
+    window.addEventListener('scroll', function() {
+      nav.classList.toggle('scrolled', window.scrollY > 10);
+    }, { passive: true });
+    if (mobileBtn) {
+      mobileBtn.addEventListener('click', function() {
+        var open = mobileMenu.classList.toggle('open');
+        hamburger.classList.toggle('hidden', open);
+        closeIco.classList.toggle('hidden', !open);
+      });
+    }
+
+    // ── Toast system ──────────────────────────────────────────────────────
+    window.showToast = function(msg, type, duration) {
+      type = type || 'info';
+      duration = duration || 4000;
+      var icons = { success:'✅', error:'❌', info:'ℹ️', warning:'⚠️' };
+      var container = document.getElementById('toast-container');
+      var t = document.createElement('div');
+      t.className = 'toast toast-' + type;
+      t.innerHTML = '<span>' + (icons[type]||'') + '</span><span style="flex:1">' + msg + '</span>';
+      t.onclick = function() { dismiss(t); };
+      container.appendChild(t);
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() { t.classList.add('show'); });
+      });
+      var timer = setTimeout(function() { dismiss(t); }, duration);
+      function dismiss(el) {
+        clearTimeout(timer);
+        el.classList.remove('show'); el.classList.add('hide');
+        setTimeout(function() { el.remove(); }, 400);
+      }
+    };
+
+    // ── Scroll reveal ─────────────────────────────────────────────────────
+    var revealIO = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) { e.target.classList.add('visible'); revealIO.unobserve(e.target); }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -20px 0px' });
+    document.querySelectorAll('.anim-reveal').forEach(function(el) { revealIO.observe(el); });
+
+    // ── Keyboard shortcuts ────────────────────────────────────────────────
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        var m = document.getElementById('shortcuts-modal');
+        if (m) { m.classList.add('hidden'); m.style.display = ''; }
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+        e.preventDefault();
+        window.location.href = '{{ url_for("agent.apply_page") }}';
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === '/' || e.key === '?')) {
+        e.preventDefault();
+        var m = document.getElementById('shortcuts-modal');
+        if (m) {
+          var hidden = m.classList.toggle('hidden');
+          m.style.display = hidden ? '' : 'flex';
+        }
+      }
+    });
+  })();
+  </script>
+</body>
+</html>

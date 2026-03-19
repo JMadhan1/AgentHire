@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Application #{{ application.id }} — AgentHire{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Back breadcrumb -->
+  <div class="anim-reveal mb-6">
+    <a href="{{ url_for('agent.dashboard') }}"
+       class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-300 transition-colors group">
+      <span class="transition-transform group-hover:-translate-x-1">←</span> Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Header Card -->
+  <div class="glass-card p-6 mb-5 anim-reveal" style="transition-delay:0.05s">
+    <div class="flex items-start justify-between gap-4 flex-wrap">
+      <div>
+        <div class="section-badge mb-2">
+          {% set domain = application.job_url.split('/')[2] if application.job_url else '' %}
+          {{ domain }}
+        </div>
+        <h1 class="text-2xl font-black text-white leading-tight">
+          {{ application.company or 'Unknown Company' }}
+        </h1>
+        <p class="text-slate-400 mt-1">{{ application.role_title or 'Role not detected' }}</p>
+        <a href="{{ application.job_url }}" target="_blank" rel="noopener noreferrer"
+           class="mt-2 inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-colors">
+          🔗 {{ application.job_url[:65] }}{% if application.job_url|length > 65 %}…{% endif %} ↗
+        </a>
+      </div>
+
+      <!-- Status badge -->
+      <span class="px-4 py-2 rounded-xl text-sm font-bold
+        {% if application.status == 'submitted' %}badge-submitted
+        {% elif application.status == 'in_progress' %}badge-running
+        {% elif application.status == 'failed' %}badge-failed
+        {% else %}badge-pending{% endif %}"
+        style="align-self:flex-start">
+        {% if application.status == 'submitted' %}✅ Submitted
+        {% elif application.status == 'in_progress' %}⏳ In Progress
+        {% elif application.status == 'failed' %}❌ Failed
+        {% else %}⏸ Pending{% endif %}
+      </span>
+    </div>
+
+    <!-- Meta row -->
+    <div class="flex flex-wrap gap-6 mt-5 pt-5 border-t border-white/5 text-sm">
+      <div>
+        <p class="text-xs text-slate-600 uppercase tracking-wider mb-0.5">Created</p>
+        <p class="text-slate-300 font-medium">{{ application.created_at.strftime('%b %d, %Y · %H:%M') if application.created_at else '—' }}</p>
+      </div>
+      {% if application.completed_at %}
+      <div>
+        <p class="text-xs text-slate-600 uppercase tracking-wider mb-0.5">Completed</p>
+        <p class="text-slate-300 font-medium">{{ application.completed_at.strftime('%b %d, %Y · %H:%M') }}</p>
+      </div>
+      {% endif %}
+      <div>
+        <p class="text-xs text-slate-600 uppercase tracking-wider mb-0.5">Application ID</p>
+        <p class="text-slate-300 font-mono font-medium">#{{ application.id }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success / Failure banner -->
+  {% if application.status == 'submitted' %}
+  <div class="anim-reveal mb-5 flex items-start gap-3 p-4 rounded-2xl" style="transition-delay:0.08s;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2)">
+    <span class="text-2xl">✅</span>
+    <div>
+      <p class="font-bold text-emerald-300">Application submitted successfully</p>
+      <p class="text-emerald-400/70 text-sm mt-0.5">The AI agent navigated the career portal and submitted your application.</p>
+    </div>
+  </div>
+  {% elif application.status == 'failed' %}
+  <div class="anim-reveal mb-5 flex items-start gap-3 p-4 rounded-2xl" style="transition-delay:0.08s;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2)">
+    <span class="text-2xl">❌</span>
+    <div>
+      <p class="font-bold text-red-300">Application failed</p>
+      {% if application.error_msg %}
+      <p class="text-red-400/70 text-sm mt-0.5">{{ application.error_msg }}</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Agent Log -->
+  {% if application.agent_log %}
+  <div class="glass-card overflow-hidden mb-5 anim-reveal" style="transition-delay:0.1s">
+    <button id="log-toggle" class="w-full flex items-center justify-between p-5 text-left hover:bg-white/3 transition-colors"
+            onclick="toggleLog()">
+      <div class="flex items-center gap-3">
+        <span style="width:8px;height:8px;background:{% if application.status == 'submitted' %}#10b981{% elif application.status == 'failed' %}#ef4444{% else %}#f59e0b{% endif %};border-radius:50%;box-shadow:0 0 8px {% if application.status == 'submitted' %}#10b981{% elif application.status == 'failed' %}#ef4444{% else %}#f59e0b{% endif %};display:inline-block"></span>
+        <h2 class="text-base font-bold text-white">🤖 Agent Activity Log</h2>
+      </div>
+      <span id="log-chevron" class="text-slate-400 text-sm transition-transform duration-300">▼</span>
+    </button>
+
+    <div id="log-content" class="border-t border-white/5">
+      <div class="p-5 max-h-96 overflow-y-auto" style="background:rgba(0,0,0,0.3);font-family:JetBrains Mono,Fira Code,monospace">
+        <div class="space-y-1.5 text-xs">
+          {% for line in application.agent_log.split('\n') %}
+            {% if line.strip() %}
+            <div class="flex items-start gap-3">
+              <span class="text-slate-700 w-6 text-right shrink-0 select-none">{{ loop.index }}</span>
+              <span class="shrink-0
+                {% if '\"type\":\"ACTION\"' in line or 'ACTION' in line %}text-blue-400
+                {% elif 'COMPLETE' in line or 'submitted' in line.lower() %}text-emerald-400
+                {% elif 'ERROR' in line or 'error' in line.lower() %}text-red-400
+                {% elif 'NAVIGATION' in line or 'Navigat' in line %}text-purple-400
+                {% elif 'HEARTBEAT' in line %}text-slate-600
+                {% else %}text-yellow-400{% endif %}">▶</span>
+              <span class="text-slate-400 break-all leading-relaxed">{{ line[:300] }}</span>
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Action Buttons -->
+  <div class="flex flex-col sm:flex-row gap-3 anim-reveal" style="transition-delay:0.14s">
+    <a href="{{ url_for('agent.dashboard') }}" class="btn-ghost flex-1 justify-center">
+      ← Back to Dashboard
+    </a>
+    {% if application.status in ['submitted', 'failed'] %}
+    <form method="POST" action="{{ url_for('agent.reapply', app_id=application.id) }}" class="flex-1">
+      <button type="submit" class="btn-grad w-full py-3">
+        🔄 Re-apply to Same Job
+      </button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+function toggleLog() {
+  var content = document.getElementById('log-content');
+  var chevron = document.getElementById('log-chevron');
+  var hidden  = content.style.display === 'none';
+  content.style.display = hidden ? '' : 'none';
+  chevron.style.transform = hidden ? 'rotate(0deg)' : 'rotate(-90deg)';
+}
+</script>
+{% endblock %}

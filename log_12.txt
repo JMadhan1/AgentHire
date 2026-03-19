@@ -1,0 +1,26 @@
+{"type": "STARTED", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "timestamp": "2026-03-14T09:38:30.119Z"}
+{"type": "STREAMING_URL", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "streamingUrl": "https://ip-54-215-224-5.tetra-data.production.tinyfish.io/tf-16cc80d6-ae98-454e-94b9-45371b01865f/stream/0", "timestamp": "2026-03-14T09:38:41.004Z"}
+{"type": "PROGRESS", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "purpose": "Visit OpenAI jobs page to find the desired role.", "timestamp": "2026-03-14T09:38:45.981Z"}
+{"type": "STREAMING_URL", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "streamingUrl": "https://ip-54-215-224-5.tetra-data.production.tinyfish.io/tf-16cc80d6-ae98-454e-94b9-45371b01865f/stream/0", "timestamp": "2026-03-14T09:38:47.328Z"}
+{"type": "PROGRESS", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "purpose": "Check if the OpenAI jobs page is loaded and find the \"gen-AI engineer\" role.", "timestamp": "2026-03-14T09:38:49.985Z"}
+{"type": "PROGRESS", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "purpose": "Search for OpenAI Lever jobs or careers to find the correct URL.", "timestamp": "2026-03-14T09:38:54.759Z"}
+{"type": "STREAMING_URL", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "streamingUrl": "https://ip-54-215-224-5.tetra-data.production.tinyfish.io/tf-16cc80d6-ae98-454e-94b9-45371b01865f/stream/0", "timestamp": "2026-03-14T09:38:57.094Z"}
+{"type": "PROGRESS", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "purpose": "Visit OpenAI official careers page to find the \"gen-AI engineer\" role.", "timestamp": "2026-03-14T09:39:01.258Z"}
+{"type": "STREAMING_URL", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "streamingUrl": "https://ip-54-215-224-5.tetra-data.production.tinyfish.io/tf-16cc80d6-ae98-454e-94b9-45371b01865f/stream/0", "timestamp": "2026-03-14T09:39:09.204Z"}
+{"type": "PROGRESS", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "purpose": "Find the job search input on the OpenAI careers page.", "timestamp": "2026-03-14T09:39:13.670Z"}
+{"type": "PROGRESS", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "purpose": "Open the filter to search for the specific job title.", "timestamp": "2026-03-14T09:39:24.913Z"}
+{"type": "STREAMING_URL", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "streamingUrl": "https://ip-54-215-224-5.tetra-data.production.tinyfish.io/tf-16cc80d6-ae98-454e-94b9-45371b01865f/stream/0", "timestamp": "2026-03-14T09:39:26.673Z"}
+{"type": "PROGRESS", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "purpose": "Search for \"gen-AI\" to find the most relevant role.", "timestamp": "2026-03-14T09:39:31.066Z"}
+{"type": "PROGRESS", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "purpose": "Search for \"AI Engineer\" to find the most relevant role.", "timestamp": "2026-03-14T09:39:35.272Z"}
+{"type": "PROGRESS", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "purpose": "Visit OpenAI Ashby jobs page to find the specific \"gen-AI engineer\" role.", "timestamp": "2026-03-14T09:39:44.702Z"}
+{"type": "STREAMING_URL", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "streamingUrl": "https://ip-54-215-224-5.tetra-data.production.tinyfish.io/tf-16cc80d6-ae98-454e-94b9-45371b01865f/stream/0", "timestamp": "2026-03-14T09:39:47.245Z"}
+{"type": "PROGRESS", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "purpose": "Search for the exact role \"gen-AI engineer\" or the closest match.", "timestamp": "2026-03-14T09:39:51.180Z"}
+{"type": "PROGRESS", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "purpose": "Go to the job details for Research Engineer, Applied AI Engineering.", "timestamp": "2026-03-14T09:39:59.800Z"}
+{"type": "STREAMING_URL", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "streamingUrl": "https://ip-54-215-224-5.tetra-data.production.tinyfish.io/tf-16cc80d6-ae98-454e-94b9-45371b01865f/stream/0", "timestamp": "2026-03-14T09:40:02.750Z"}
+{"type": "PROGRESS", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "purpose": "Navigate to the specific job page for Research Engineer, Applied AI Engineering.", "timestamp": "2026-03-14T09:40:06.341Z"}
+{"type": "STREAMING_URL", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "streamingUrl": "https://ip-54-215-224-5.tetra-data.production.tinyfish.io/tf-16cc80d6-ae98-454e-94b9-45371b01865f/stream/0", "timestamp": "2026-03-14T09:40:08.979Z"}
+{"type": "PROGRESS", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "purpose": "Open the application form.", "timestamp": "2026-03-14T09:40:13.037Z"}
+{"type": "STREAMING_URL", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "streamingUrl": "https://ip-54-215-224-5.tetra-data.production.tinyfish.io/tf-16cc80d6-ae98-454e-94b9-45371b01865f/stream/0", "timestamp": "2026-03-14T09:40:15.070Z"}
+{"type": "PROGRESS", "runId": "2a891a2a-5a2a-4f47-9eef-4ce096ed7d3e", "purpose": "Download the candidate's resume.", "timestamp": "2026-03-14T09:40:21.939Z"}
+{"type": "HEARTBEAT", "timestamp": "2026-03-14T09:40:36.940Z"}
+{"type": "HEARTBEAT", "timestamp": "2026-03-14T09:40:51.940Z"}

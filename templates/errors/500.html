@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}500 — Server Error · AgentHire{% endblock %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center text-center px-4" style="position:relative;overflow:hidden">
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:350px;background:radial-gradient(ellipse,rgba(245,158,11,0.06) 0%,transparent 65%);pointer-events:none"></div>
+
+  <div class="anim-reveal">
+    <div class="text-9xl font-black mb-2 leading-none"
+         style="background:linear-gradient(135deg,#f1f5f9 0%,rgba(245,158,11,0.7) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">500</div>
+
+    <div class="text-5xl mb-6" style="animation:spin500 4s linear infinite">⚙️</div>
+
+    <h1 class="text-2xl font-bold text-white mb-3">Something Went Wrong</h1>
+    <p class="text-slate-400 mb-3 max-w-sm mx-auto">Our server encountered an unexpected error. It's not you — it's us.</p>
+    <p class="text-xs text-slate-600 mb-8">The error has been logged. Please try again in a moment.</p>
+
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="{{ url_for('agent.index') }}" class="btn-grad px-8 py-3">← Go Home</a>
+      <button onclick="history.back()" class="btn-ghost px-8 py-3">↩ Go Back</button>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes spin500 { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+</style>
+{% endblock %}

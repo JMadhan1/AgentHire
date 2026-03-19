@@ -1,0 +1,14 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+agenthire.db
+static/uploads/*
+!static/uploads/.gitkeep
+.DS_Store
+agenthire.log
+venv/
+.venv/
+*.egg-info/
+dist/
+build/

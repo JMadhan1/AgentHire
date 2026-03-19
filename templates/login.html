@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Sign In — AgentHire{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-4 py-16" style="position:relative;overflow:hidden">
+
+  <!-- Ambient orb behind form -->
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(99,102,241,0.08) 0%,transparent 70%);pointer-events:none"></div>
+
+  <div class="w-full max-w-md anim-reveal">
+
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <a href="{{ url_for('agent.index') }}" class="inline-flex flex-col items-center gap-3 group">
+        <svg width="52" height="52" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+             style="transition:transform 0.3s;filter:drop-shadow(0 0 16px rgba(139,92,246,0.5))" class="group-hover:scale-110">
+          <defs>
+            <linearGradient id="lg1" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#8b5cf6"/><stop offset="50%" stop-color="#6366f1"/><stop offset="100%" stop-color="#3b82f6"/>
+            </linearGradient>
+            <linearGradient id="lg2" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#e0e7ff"/><stop offset="100%" stop-color="#bfdbfe"/>
+            </linearGradient>
+          </defs>
+          <rect width="64" height="64" rx="14" fill="#0f0a1e"/>
+          <path d="M32 8 L50 18 L50 36 Q50 49 32 57 Q14 49 14 36 L14 18 Z" fill="url(#lg1)" opacity="0.92"/>
+          <path d="M32 20 L23 43 H27 L29.5 37 H34.5 L37 43 H41 L32 20Z M30.5 33 L32 28 L33.5 33 Z" fill="url(#lg2)" fill-rule="evenodd"/>
+          <circle cx="26.5" cy="47" r="2" fill="#e0e7ff" opacity="0.9"/>
+          <circle cx="37.5" cy="47" r="2" fill="#e0e7ff" opacity="0.9"/>
+        </svg>
+        <div>
+          <h1 class="text-2xl font-black" style="background:linear-gradient(135deg,#f1f5f9,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Welcome back</h1>
+          <p class="text-slate-500 text-sm mt-0.5">Sign in to your AgentHire account</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+      <div class="mb-4 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium
+        {% if cat == 'error' %}text-red-300 border border-red-500/25{% else %}text-emerald-300 border border-emerald-500/25{% endif %}"
+        style="{% if cat == 'error' %}background:rgba(239,68,68,0.08){% else %}background:rgba(16,185,129,0.08){% endif %}">
+        {{ '❌' if cat == 'error' else '✅' }} {{ msg }}
+      </div>
+      {% endfor %}
+    {% endwith %}
+
+    <!-- Card -->
+    <div class="glass-card p-8">
+      <form method="POST" action="{{ url_for('auth.login') }}" id="login-form">
+
+        <div class="mb-5">
+          <label for="email" class="form-label">Email Address</label>
+          <input type="email" id="email" name="email" autocomplete="email"
+                 value="{{ email|default('') }}"
+                 class="form-input" placeholder="you@example.com" required autofocus>
+        </div>
+
+        <div class="mb-7">
+          <label for="password" class="form-label">Password</label>
+          <div style="position:relative">
+            <input type="password" id="password" name="password" autocomplete="current-password"
+                   class="form-input" placeholder="Your password" required style="padding-right:2.8rem">
+            <button type="button" id="toggle-pw"
+                    style="position:absolute;right:0.85rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#475569;font-size:1rem;transition:color 0.2s"
+                    onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'"
+                    aria-label="Toggle password visibility">👁</button>
+          </div>
+        </div>
+
+        <button type="submit" id="login-submit" class="btn-grad w-full py-3.5 text-base">
+          <span id="login-icon">→</span>
+          <span id="login-text">Sign In</span>
+        </button>
+      </form>
+    </div>
+
+    <p class="text-center text-slate-500 mt-6 text-sm">
+      Don't have an account?
+      <a href="{{ url_for('auth.register') }}" class="text-purple-400 hover:text-purple-300 font-semibold transition-colors">Create one free →</a>
+    </p>
+  </div>
+</div>
+
+<script>
+// Toggle password visibility
+document.getElementById('toggle-pw').addEventListener('click', function() {
+  var pw = document.getElementById('password');
+  pw.type = pw.type === 'password' ? 'text' : 'password';
+  this.textContent = pw.type === 'password' ? '👁' : '🙈';
+});
+
+// Loading state on submit
+document.getElementById('login-form').addEventListener('submit', function() {
+  var btn  = document.getElementById('login-submit');
+  var icon = document.getElementById('login-icon');
+  var text = document.getElementById('login-text');
+  btn.disabled = true;
+  icon.innerHTML = '<span class="spinner" style="width:16px;height:16px"></span>';
+  text.textContent = 'Signing in...';
+});
+</script>
+{% endblock %}

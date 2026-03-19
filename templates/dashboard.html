@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — AgentHire{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between flex-wrap gap-4 mb-8 anim-reveal">
+    <div>
+      <div class="section-badge">📊 Overview</div>
+      <h1 class="page-title">Your Applications</h1>
+      <p class="text-slate-500 mt-1 text-sm">Every job the AI agent has applied to on your behalf.</p>
+    </div>
+    <a href="{{ url_for('agent.apply_page') }}" id="new-application-btn" class="btn-grad px-6 py-3">
+      🚀 New Application
+    </a>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+    {% set stat_cards = [
+      ('📋', stats.total,         'Total Applied',  'rgba(139,92,246,0.12)', 'rgba(139,92,246,0.3)', '#a78bfa'),
+      ('✅', stats.submitted,     'Submitted',       'rgba(16,185,129,0.10)', 'rgba(16,185,129,0.3)', '#34d399'),
+      ('❌', stats.total - stats.submitted - stats.in_progress, 'Failed', 'rgba(239,68,68,0.10)', 'rgba(239,68,68,0.3)', '#f87171'),
+      ('📈', stats.success_rate,  'Success Rate',    'rgba(59,130,246,0.10)', 'rgba(59,130,246,0.3)',  '#60a5fa'),
+    ] %}
+    {% for icon, val, label, bg, border, clr in stat_cards %}
+    <div class="glass-card p-5 text-center anim-reveal" style="transition-delay:{{ loop.index0 * 0.06 }}s; border-top: 2px solid {{ border }}; background:{{ bg }}">
+      <div class="text-2xl mb-1">{{ icon }}</div>
+      <div class="text-3xl font-900 font-black" style="color:{{ clr }}">{{ val }}{% if label == 'Success Rate' %}%{% endif %}</div>
+      <div class="text-xs text-slate-500 mt-1 font-medium uppercase tracking-wider">{{ label }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="glass-card px-4 py-3 mb-6 flex flex-wrap items-center gap-3 anim-reveal" style="transition-delay:0.1s">
+    <div class="flex gap-1.5 flex-wrap" id="filter-tabs">
+      {% for tab_id, label, count in [
+        ('all',         'All',         stats.total),
+        ('submitted',   '✅ Submitted', stats.submitted),
+        ('in_progress', '⏳ Running',   stats.in_progress),
+        ('failed',      '❌ Failed',    stats.total - stats.submitted - stats.in_progress),
+        ('pending',     '⏸ Pending',   0),
+      ] %}
+      <button id="tab-{{ tab_id }}" data-filter="{{ tab_id }}" class="filter-tab px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200
+        {% if loop.first %}text-white{% else %}text-slate-400 hover:text-white{% endif %}"
+        style="{% if loop.first %}background:linear-gradient(135deg,#8b5cf6,#6366f1);box-shadow:0 0 12px rgba(139,92,246,0.3){% else %}background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06){% endif %}">
+        {{ label }}{% if count %} <span class="opacity-60">({{ count }})</span>{% endif %}
+      </button>
+      {% endfor %}
+    </div>
+
+    <!-- Search -->
+    <div class="ml-auto flex items-center gap-2">
+      <input id="dash-search" type="text" placeholder="Search by company or URL..."
+             class="form-input py-1.5 text-xs w-48" style="border-radius:9999px">
+    </div>
+  </div>
+
+  <!-- Application Cards -->
+  {% if applications %}
+  <div id="application-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for app in applications %}
+    <div class="app-card glass-card p-5 flex flex-col gap-3 anim-reveal transition-all duration-300 hover:-translate-y-1 cursor-default"
+         data-status="{{ app.status }}"
+         data-search="{{ (app.company or '') ~ ' ' ~ (app.job_url or '') }}"
+         style="transition-delay:{{ loop.index0 * 0.04 }}s">
+
+      <!-- Top row: company + status -->
+      <div class="flex items-start justify-between gap-2">
+        <div class="min-w-0 flex-1">
+          {% set domain = app.job_url.split('/')[2] if app.job_url and '/' in app.job_url else '' %}
+          <p class="text-base font-bold text-white truncate">{{ app.company or domain or '—' }}</p>
+          <p class="text-xs text-slate-500 truncate mt-0.5">{{ app.role_title or 'Role TBD' }}</p>
+        </div>
+        <span class="shrink-0 px-2.5 py-1 rounded-full text-xs font-bold
+          {% if app.status == 'submitted' %}badge-submitted
+          {% elif app.status == 'in_progress' %}badge-running
+          {% elif app.status == 'failed' %}badge-failed
+          {% else %}badge-pending{% endif %}">
+          {% if app.status == 'submitted' %}✅ Submitted
+          {% elif app.status == 'in_progress' %}<span style="display:inline-block;width:8px;height:8px;border:2px solid #fbbf24;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite"></span> Running
+          {% elif app.status == 'failed' %}❌ Failed
+          {% else %}⏸ Pending{% endif %}
+        </span>
+      </div>
+
+      <!-- URL -->
+      <a href="{{ app.job_url }}" target="_blank" rel="noopener noreferrer"
+         class="text-xs text-purple-400/70 hover:text-purple-400 truncate block transition-colors" title="{{ app.job_url }}">
+        🔗 {{ app.job_url[:55] }}{% if app.job_url|length > 55 %}…{% endif %}
+      </a>
+
+      <!-- Timestamp -->
+      <p class="text-xs text-slate-600">
+        📅 {{ app.created_at.strftime('%b %d, %Y · %H:%M') if app.created_at else '—' }}
+      </p>
+
+      <!-- Actions -->
+      <div class="flex gap-2 mt-auto pt-2 border-t border-white/5">
+        <a href="{{ url_for('agent.application_detail', app_id=app.id) }}"
+           class="flex-1 text-center py-2 text-xs font-semibold rounded-xl transition-all duration-200 text-slate-400 border border-white/6 hover:border-purple-500/40 hover:text-purple-300 hover:bg-purple-500/5">
+          View Details →
+        </a>
+        {% if app.status in ['submitted', 'failed'] %}
+        <form method="POST" action="{{ url_for('agent.reapply', app_id=app.id) }}">
+          <button type="submit" class="px-3 py-2 text-xs font-semibold rounded-xl border border-white/6 text-slate-500 hover:text-white hover:border-blue-500/40 hover:bg-blue-500/5 transition-all">
+            🔄
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Empty search state -->
+  <div id="no-results-msg" class="hidden text-center py-16">
+    <div class="text-4xl mb-3">🔍</div>
+    <p class="text-slate-400">No applications match your search.</p>
+  </div>
+
+  {% else %}
+  <!-- Empty state -->
+  <div class="glass-card p-16 text-center anim-reveal">
+    <div class="text-6xl mb-5">🤖</div>
+    <h2 class="text-2xl font-bold text-white mb-2">No applications yet</h2>
+    <p class="text-slate-400 text-sm mb-8 max-w-xs mx-auto">Paste job URLs and let your AI agent apply to dozens of roles while you sleep.</p>
+    <a href="{{ url_for('agent.apply_page') }}" class="btn-grad px-10 py-3">🚀 Start Applying →</a>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+@keyframes spin { to{transform:rotate(360deg)} }
+</style>
+
+<script>
+(function() {
+  var tabs  = document.querySelectorAll('.filter-tab');
+  var cards = document.querySelectorAll('.app-card');
+  var search = document.getElementById('dash-search');
+  var noRes  = document.getElementById('no-results-msg');
+
+  function applyFilters() {
+    var filter = document.querySelector('.filter-tab.active-tab')?.dataset.filter || 'all';
+    var q = (search ? search.value.toLowerCase() : '');
+    var visible = 0;
+    cards.forEach(function(c) {
+      var statusOk = filter === 'all' || c.dataset.status === filter;
+      var searchOk = !q || (c.dataset.search || '').toLowerCase().includes(q);
+      var show = statusOk && searchOk;
+      c.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    if (noRes) noRes.classList.toggle('hidden', visible > 0);
+  }
+
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      tabs.forEach(function(t) {
+        t.classList.remove('active-tab');
+        t.style.background = 'rgba(255,255,255,0.04)';
+        t.style.boxShadow  = '';
+        t.style.color      = '';
+      });
+      tab.classList.add('active-tab');
+      tab.style.background = 'linear-gradient(135deg,#8b5cf6,#6366f1)';
+      tab.style.boxShadow  = '0 0 12px rgba(139,92,246,0.3)';
+      tab.style.color      = '#fff';
+      applyFilters();
+    });
+  });
+
+  if (tabs.length) tabs[0].classList.add('active-tab');
+  if (search) search.addEventListener('input', applyFilters);
+
+  // Ctrl+K focus search
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      if (search) { search.focus(); search.select(); }
+    }
+  });
+})();
+</script>
+{% endblock %}
