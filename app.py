@@ -17,7 +17,6 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler("agenthire.log", encoding="utf-8"),
     ],
 )
 logger = logging.getLogger(__name__)
@@ -79,9 +78,12 @@ def create_app(config_class=Config) -> Flask:
     return app
 
 
+# ─── Module-level app instance (required by Vercel WSGI runtime) ──────────────
+app = create_app()
+
+
 # ─── Entry Point ──────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    app = create_app()
     logger.info("Starting AgentHire development server...")
     app.run(debug=True, host="0.0.0.0", port=5001)

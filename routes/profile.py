@@ -133,16 +133,16 @@ def upload_resume():
     timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
     filename = f"{current_user.id}_{timestamp}_{original_name}"
 
+    # Try to save to filesystem (local dev). On Vercel /tmp is ephemeral so we
+    # always store the bytes in the DB as the authoritative copy.
     upload_folder = current_app.config["UPLOAD_FOLDER"]
-    os.makedirs(upload_folder, exist_ok=True)
-    save_path = os.path.join(upload_folder, filename)
-
     try:
+        os.makedirs(upload_folder, exist_ok=True)
+        save_path = os.path.join(upload_folder, filename)
         with open(save_path, "wb") as f:
             f.write(pdf_bytes)
     except Exception as e:
-        logger.exception(f"Error saving resume file: {e}")
-        return jsonify({"success": False, "error": "Failed to save file."}), 500
+        logger.warning(f"Could not save resume to filesystem (will use DB copy): {e}")
 
     # ── Parse resume for auto-fill ───────────────────────────────────────────
     parsed_fields = {}
@@ -163,7 +163,8 @@ def upload_resume():
     if not profile:
         profile = Profile(user_id=current_user.id)
 
-    profile.resume_path = filename
+    profile.resume_path = filename       # keep for display name
+    profile.resume_data = pdf_bytes      # store bytes in DB (works on Vercel)
     profile.updated_at = datetime.utcnow()
 
     # Only fill DB fields that are currently blank (don't clobber existing data)

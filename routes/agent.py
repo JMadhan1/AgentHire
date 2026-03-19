@@ -263,11 +263,14 @@ def stream_application(application_id: int):
         completed = False
         base_url = request.url_root
 
-        # Read resume bytes from disk and pass directly to the agent payload.
-        # This avoids needing a public URL — TinyFish receives the file as base64.
+        # Load resume bytes — prefer DB copy (works on Vercel), fall back to disk.
         resume_bytes = None
         resume_filename = "resume.pdf"
-        if app_record.resume_path:
+        if profile.resume_data:
+            resume_bytes = bytes(profile.resume_data)
+            resume_filename = os.path.basename(app_record.resume_path or profile.resume_path or "resume.pdf")
+            logger.info(f"Resume loaded from DB: {resume_filename} ({len(resume_bytes)} bytes)")
+        elif app_record.resume_path:
             resume_file_path = os.path.join(current_app.config["UPLOAD_FOLDER"], app_record.resume_path)
             if os.path.isfile(resume_file_path):
                 with open(resume_file_path, "rb") as f:
@@ -275,7 +278,7 @@ def stream_application(application_id: int):
                 resume_filename = os.path.basename(app_record.resume_path)
                 logger.info(f"Resume loaded from disk: {resume_filename} ({len(resume_bytes)} bytes)")
             else:
-                logger.warning(f"Resume file not found on disk: {resume_file_path}")
+                logger.warning(f"Resume not in DB or disk: {resume_file_path}")
 
         try:
             for event in agent.apply_to_job(

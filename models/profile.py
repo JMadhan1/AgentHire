@@ -35,7 +35,8 @@ class Profile(db.Model):
     portfolio_url = db.Column(db.String(500), nullable=True)
 
     # Documents
-    resume_path = db.Column(db.String(500), nullable=True)
+    resume_path = db.Column(db.String(500), nullable=True)       # original filename (display only)
+    resume_data = db.Column(db.LargeBinary, nullable=True)       # raw PDF bytes stored in DB
     cover_letter_template = db.Column(db.Text, nullable=True)
 
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
