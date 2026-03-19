@@ -41,7 +41,7 @@ def create_app(config_class=Config) -> Flask:
 
     @login_manager.user_loader
     def load_user(user_id: str):
-        return User.query.get(int(user_id))
+        return db.session.get(User, int(user_id))
 
     # ── Blueprints ───────────────────────────────────────────────────────────
     from routes.auth import auth_bp
@@ -60,7 +60,8 @@ def create_app(config_class=Config) -> Flask:
 
     @app.errorhandler(500)
     def server_error(e):
-        logger.error(f"500 error: {e}")
+        import traceback
+        logger.exception(f"500 error: {e}\n{traceback.format_exc()}")
         return render_template("errors/500.html"), 500
 
     @app.errorhandler(413)

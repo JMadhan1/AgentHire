@@ -20,10 +20,15 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
 
     # SQLAlchemy database URI
-    _db_url = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL") or "sqlite:///agenthire.db"
+    # On Vercel without a PostgreSQL URL fall back to /tmp (ephemeral but writable).
+    _db_url = (
+        os.environ.get("DATABASE_URL")
+        or os.environ.get("POSTGRES_URL")
+        or ("sqlite:////tmp/agenthire.db" if os.environ.get("VERCEL") else "sqlite:///agenthire.db")
+    )
     if _db_url.startswith("postgres://"):
         _db_url = _db_url.replace("postgres://", "postgresql://", 1)
-    
+
     SQLALCHEMY_DATABASE_URI = _db_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
